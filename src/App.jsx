@@ -13,6 +13,7 @@ import ForgetPassword from "./pages/ForgetPassword";
 import NotAuthorized from "./pages/NotAuthorized";
 import Signin from "./pages/Signin";
 import Signup from "./pages/Signup";
+import Lead from "./pages/Lead";
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
               <Route element={<PrivateRoute />}>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/lead" element={<Lead />} />
                 <Route path="/not-authorized" element={<NotAuthorized />} />
               </Route>
               <Route path="/signin" element={<Signin />} />
