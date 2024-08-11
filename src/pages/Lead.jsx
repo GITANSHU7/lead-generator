@@ -8,6 +8,7 @@ import {
     TextInput
 } from "flowbite-react";
 import React, { useEffect, useState } from "react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FaEdit } from "react-icons/fa";
 import { HiOutlineExclamationCircle, HiPlusCircle } from "react-icons/hi";
@@ -133,32 +134,62 @@ const Lead = () => {
     }
   };
 
-  const createLead = async () => {
+  const createLead = async (data) => {
     try {
-     
       const apiToken = user?.data?.token;
 
       if (!apiToken) {
         throw new Error("Missing authorization token");
       }
 
-      const response = await axios.post(`https://authenticator-server.vercel.app/lead/create`, newLead, {
-        headers: {
-          Authorization: `Bearer ${apiToken}`,
-        },
-      });
-      await loadLead();
+      const response = await axios.post(
+        "https://authenticator-server.vercel.app/lead/create",
+        data,
+        {
+          headers: {
+            Authorization: `Bearer ${apiToken}`,
+          },
+        }
+      );
+
+      console.log(data);
+
+      await loadLead(); // Refresh the lead list after creation
       toast.success("Lead created successfully");
-      setCreateModalOpen(false);
-      setNewLead({  name: "",
-        email: "",
-        number: "",
-        products: [{ productName: "", quantity: 0, price: "" }] });
+      setCreateModalOpen(false); // Close the modal
+      reset(); // Reset the form fields
     } catch (error) {
       console.error(error.message || "Error creating lead");
       toast.error("Failed to create lead");
     }
   };
+
+//   const createLead = async () => {
+//     try {
+     
+//       const apiToken = user?.data?.token;
+
+//       if (!apiToken) {
+//         throw new Error("Missing authorization token");
+//       }
+
+//       const response = await axios.post(`https://authenticator-server.vercel.app/lead/create`, data, {
+//         headers: {
+//           Authorization: `Bearer ${apiToken}`,
+//         },
+//       });
+//       await loadLead();
+//       toast.success("Lead created successfully");
+//       setCreateModalOpen(false);
+//     //   setNewLead({  name: "",
+//     //     email: "",
+//     //     number: "",
+//     //     products: [{ productName: "", quantity: 0, price: "" }] });
+//     } catch (error) {
+//       console.error(error.message || "Error creating lead");
+//       toast.error("Failed to create lead");
+//     }
+//   };
   const handleProductChangeEdit = (index, field, value) => {
     const updatedProducts = leadToEdit.products.map((product, i) => 
       i === index ? { ...product, [field]: value } : product
@@ -246,28 +277,24 @@ const Lead = () => {
     
       //  for add product
 
-      const handleProductChange1 = (index, field, value) => {
-        const updatedProducts = [...newLead?.products];
-        updatedProducts[index] = {
-          ...updatedProducts[index],
-          [field]: value,
-        };
-        setNewLead({ ...newLead, products: updatedProducts });
-      };
+      const { control, handleSubmit, setValue, reset } = useForm({
+        defaultValues: {
+        //   name: "",
+        //   email: "",
+        //   number: "",
+          products: [{ productName: "", quantity: "", price: "" }],
+        },
+      });
+
+      const { fields, append, remove } = useFieldArray({
+        control,
+        name: "products",
+      });
     
-      const addProductForCreate1 = () => {
-        setNewLead({
-          ...newLead,
-          products: [...newLead.products, { productName: "", quantity: 0, price: 0 }],
-        });
+      const onSubmit = (data) => {
+        createLead(data);
+        setCreateModalOpen(false);
       };
-    
-      const removeProduct1 = (index) => {
-        if (index === 0) return; // Prevent the first (blank) product from being deleted
-        const updatedProducts = newLead.products.filter((_, i) => i !== index);
-        setNewLead({ ...newLead, products: updatedProducts });
-      };
-        
 
   return (
     <>
@@ -557,7 +584,7 @@ const Lead = () => {
       >
         <Modal.Header />
         <Modal.Body>
-          <div className="text-center">
+          {/* <div className="text-center">
             <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
                 Create Lead
             </h3>
@@ -662,7 +689,104 @@ const Lead = () => {
                 Cancel
               </Button>
             </div>
+          </div> */}
+           <form onSubmit={handleSubmit(onSubmit)}>
+          <div className="text-center">
+            <h3 className="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">
+              Create Lead
+            </h3>
+            <div className="columns-3">
+              <div>
+                <Label htmlFor="newName" value="Name" />
+                <Controller
+                  name="name"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput id="newName" type="text" {...field} />
+                  )}
+                />
+              </div>
+              <div>
+                <Label htmlFor="newEmail" value="Email" />
+                <Controller
+                  name="email"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput id="newEmail" type="email" {...field} />
+                  )}
+                />
+              </div>
+              <div>
+                <Label htmlFor="number" value="Number" />
+                <Controller
+                  name="number"
+                  control={control}
+                  render={({ field }) => (
+                    <TextInput id="number" type="number" {...field} />
+                  )}
+                />
+              </div>
+            </div>
+           
+
+            {fields.map((field, index) => (
+              <div key={field.id} className="flex gap-4 mt-4">
+                <div>
+                  <Label htmlFor={`productName-${index}`} value="Product Name" />
+                  <Controller
+                    name={`products.${index}.productName`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextInput id={`productName-${index}`} type="text" {...field} />
+                    )}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`quantity-${index}`} value="Quantity" />
+                  <Controller
+                    name={`products.${index}.quantity`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextInput id={`quantity-${index}`} type="number" {...field} />
+                    )}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`price-${index}`} value="Price" />
+                  <Controller
+                    name={`products.${index}.price`}
+                    control={control}
+                    render={({ field }) => (
+                      <TextInput id={`price-${index}`} type="number" {...field} />
+                    )}
+                  />
+                </div>
+                {index > 0 && (
+                  <Button color="red" size={'sm'} onClick={() => remove(index)}>
+                    X
+                  </Button>
+             
+                )}
+              </div>
+            ))}
+             <div className="flex justify-end mt-4">
+              <Button
+                color="blue"
+                onClick={() => append({ productName: "", quantity: "", price: "" })}
+              >
+                Add Product
+              </Button>
+            </div>
+ <div className="flex justify-center gap-4 mt-4">
+              <Button color="success" type="submit">
+                Save
+              </Button>
+              <Button color="gray" onClick={() => setCreateModalOpen(false)}>
+                Cancel
+              </Button>
+            </div>
           </div>
+        </form>
         </Modal.Body>
       </Modal>
     </>

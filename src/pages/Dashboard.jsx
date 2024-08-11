@@ -7,7 +7,7 @@ const Dashboard = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center h-[calc(100vh-56px)] text-8xl bolder">
+      <div className="flex justify-center items-center h-[calc(100vh-56px)] text-6xl bolder">
         Hello, {user?.data?.user?.name}! Welcome to the dashboard
       </div>
     </>
