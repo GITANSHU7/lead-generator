@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../Context/AuthContext";
 import { setUserData } from "../redux/authSlice";
+import { Popover, Spinner } from "flowbite-react";
 
 const Signin = () => {
   const { authenticated, setAuthenticated } = useAuth();
@@ -79,7 +80,7 @@ const Signin = () => {
 
   const apiKey = import.meta.env.VITE_SITE_KEY;
   return (
-    <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
+    <div className="min-h-screen bg-gray-100 dark:bg-neutral-700 text-gray-900 flex justify-center">
       <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
         <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
           <div></div>
@@ -105,17 +106,90 @@ const Signin = () => {
                   }
                   placeholder="Username"
                 />
+                <Popover
+                  trigger="hover"
+                  content={
+                    <div className="space-y-2 p-3">
+                      <h3 className="font-semibold text-gray-900 dark:text-white">
+                        Must have at least 7 characters
+                      </h3>
 
-                <input
-                  className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
-                  type="password"
-                  name="password"
-                  value={user.password}
-                  onChange={(e) =>
-                    setUser({ ...user, password: e.target.value })
+                      <p className="dark:text-white">It’s better to have:</p>
+                      <ul>
+                        <li className="mb-1 flex items-center">
+                          <svg
+                            className="me-2 h-3.5 w-3.5 text-green-400 dark:text-green-500"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 16 12"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M1 5.917 5.724 10.5 15 1.5"
+                            />
+                          </svg>
+                          <span className="dark:text-white">
+                            {" "}
+                            1 Upper & 1 lower case letters
+                          </span>
+                        </li>
+                        <li className="mb-1 flex items-center">
+                          <svg
+                            className="me-2 h-3.5 w-3.5 text-green-400 dark:text-green-500"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 16 12"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M1 5.917 5.724 10.5 15 1.5"
+                            />
+                          </svg>
+                          <span className="dark:text-white">
+                            1 special character
+                          </span>
+                        </li>
+                        <li className="flex items-center">
+                          <svg
+                            className="me-2 h-3.5 w-3.5 text-green-400 dark:text-green-500"
+                            aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 16 12"
+                          >
+                            <path
+                              stroke="currentColor"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth="2"
+                              d="M1 5.917 5.724 10.5 15 1.5"
+                            />
+                          </svg>
+                          <span className="dark:text-white">1 Number</span>
+                        </li>
+                      </ul>
+                    </div>
                   }
-                  placeholder="Password"
-                />
+                >
+                  <input
+                    className="w-full px-8 py-4 rounded-lg font-medium bg-gray-100 border border-gray-200 placeholder-gray-500 text-sm focus:outline-none focus:border-gray-400 focus:bg-white mt-5"
+                    type="password"
+                    name="password"
+                    value={user.password}
+                    onChange={(e) =>
+                      setUser({ ...user, password: e.target.value })
+                    }
+                    placeholder="Password"
+                  />
+                </Popover>
                 <div className="mt-4">
                   <div className="flex justify-between">
                     <ReCAPTCHA
@@ -124,7 +198,46 @@ const Signin = () => {
                     />
                   </div>
                 </div>
-                <button
+                {loading ? (
+                  <>
+                    {" "}
+                    <div className="flex items-center justify-center mt-2">
+                      <Spinner
+                        className=""
+                        aria-label="Extra large spinner example"
+                        size="xl"
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <button
+                      onClick={onLogin}
+                      disabled={buttonDisabled}
+                      className={`mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
+                        buttonDisabled ? "cursor-not-allowed opacity-50" : ""
+                      }`}
+                    >
+                      <svg
+                        className="w-6 h-6 -ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+                        <circle cx="8.5" cy={7} r={4} />
+                        <path d="M20 8v6M23 11h-6" />
+                      </svg>
+                      <span className="ml-3">
+                        {" "}
+                        {buttonDisabled ? "Fill All Details" : "Sign In"}
+                      </span>
+                    </button>
+                  </>
+                )}
+                {/* <button
                   onClick={onLogin}
                   disabled={buttonDisabled}
                   className={`mt-5 tracking-wide font-semibold bg-indigo-500 text-gray-100 w-full py-4 rounded-lg hover:bg-indigo-700 transition-all duration-300 ease-in-out flex items-center justify-center focus:shadow-outline focus:outline-none ${
@@ -147,14 +260,19 @@ const Signin = () => {
                     {" "}
                     {buttonDisabled ? "Fill All Details" : "Sign In"}
                   </span>
-                </button>
+                </button> */}
 
                 <div className="my-8 border-b text-center">
                   <div className="leading-none px-2 inline-block text-sm text-gray-600 tracking-wide font-medium bg-white transform translate-y-1/2">
                     Donot have an account?{" "}
-                    <a href="/signup" className="text-indigo-500">
+                    <span
+                      className="text-indigo-500 cursor-pointer"
+                      onClick={() => {
+                        navigate("/signup");
+                      }}
+                    >
                       Sign Up
-                    </a>
+                    </span>
                   </div>
                 </div>
               </div>
